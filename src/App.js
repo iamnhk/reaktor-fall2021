@@ -1,32 +1,60 @@
+import React from "react";
+import { useState, useEffect } from "react";
+import { getChapters, getRules } from "./parseData";
+
+import Header from "./components/Header";
+import TableOfContent from "./components/TableOfContent";
+import Content from "./components/content/Content";
+
 function App() {
-  return (
-    <div className="App container">
-      <header id="header" class="header">
-            <h1 class="main-title">Magic the Gathering rule book </h1>
-            Data was loaded from www.wizard.com . Click here to load data from different URL
-      </header>
+    const [chapters, setChapters] = useState([]);
+    const [rules, setRules] = useState([]);
 
-      <nav class="navbar" id="navbar">
-            <header>Table of Contents</header>
-            <ol class="desktop-nav">
-                <li><a class="nav-link" href="#svg">SVG</a></li>
-                <ol>
-                    <li><a href="#svg-shapes">SVG Shapes</a></li>
-                </ol>
-                
-            </ol>
-        </nav>
+    useEffect(() => {
+        const uri = `https://media.wizards.com/2021/downloads/MagicCompRules%2020210419.txt`;
+        fetch(uri)
+            .then((res) => res.text())
+            .then(
+                (text) => {
+                    setRules(getRules(text));
+                    setChapters(getChapters(text));
+                },
+                (error) => {
+                    console.log("i am error");
+                }
+            );
+    }, []);
 
-        <main class="main" id="main-doc">
-            <section id="svg" class="main-section">
-                <header>SVG</header>
-                <h2 id="svg-shapes">SVG Shapes</h2>
-                    Returns the maximum value in the given iterable using natural order.
-                </section>
-        </main>
-        
-    </div>
-  );
+    return (
+        <div className="grid grid-rows-6 h-screen">
+            <div
+                className="row-span-1 w-screen 
+                        bg-gray-100 
+                        border-gray-300 border-solid p-2 m-2 rounded shadow-lg"
+            >
+                <Header title="Rules" />
+            </div>
+            <div className="row-span-4 w-screen ">
+                <div className="grid grid-cols-12 gap-2 ">
+                    <nav
+                        className="col-span-3 
+                            bg-gray-100 
+                            border-gray-300 border-solid p-4 m-4 rounded shadow-lg"
+                    >
+                        <TableOfContent chapters={chapters} />
+                    </nav>
+
+                    <div
+                        className="col-span-9
+                                bg-gray-100 
+                                border-gray-300 border-solid p-4 m-4 rounded shadow-lg"
+                    >
+                        <Content rules={rules} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default App;
